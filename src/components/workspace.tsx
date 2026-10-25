@@ -5,12 +5,16 @@ import {
   useGroupRef,
 } from "react-resizable-panels"
 
+import { CodeEditor } from "@/components/code-editor"
+import { ProblemPane } from "@/components/problem-pane"
+import { TestsPane } from "@/components/tests-pane"
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { hallwayShortcuts as problem } from "@/problems/hallway-shortcuts"
 
 // The panel's className lands on its scrolling element, so each pane is a
 // panel styled as a white card.
@@ -50,7 +54,9 @@ export function Workspace() {
         defaultSize={`${primarySize}%`}
         minSize={isMobile ? 96 : 280}
         className={paneClassName}
-      />
+      >
+        <ProblemPane problem={problem} />
+      </ResizablePanel>
       <WorkspaceHandle />
       {/* Holds both stacked panes, so its minimum covers theirs. */}
       <ResizablePanel id="stack" minSize={isMobile ? 200 : 320}>
@@ -60,9 +66,13 @@ export function Workspace() {
             defaultSize={`${TOP_SIZE}%`}
             minSize={96}
             className={paneClassName}
-          />
+          >
+            <CodeEditor problemId={problem.id} teacher="Ms. Patel" />
+          </ResizablePanel>
           <WorkspaceHandle />
-          <ResizablePanel id="bottom" minSize={96} className={paneClassName} />
+          <ResizablePanel id="bottom" minSize={96} className={paneClassName}>
+            <TestsPane problem={problem} />
+          </ResizablePanel>
         </ResizablePanelGroup>
       </ResizablePanel>
     </ResizablePanelGroup>

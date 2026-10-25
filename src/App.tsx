@@ -4,6 +4,7 @@ import { ErrorState } from "@/components/error-state"
 import { HomeScreen } from "@/components/home-screen"
 import { LoginForm } from "@/components/login-form"
 import { VerifyEmailForm } from "@/components/verify-email-form"
+import { Button } from "@/components/ui/button"
 import { FieldDescription } from "@/components/ui/field"
 import { InvalidCodeError, sendLoginCode, verifyLoginCode } from "@/lib/auth"
 
@@ -78,6 +79,16 @@ export function App() {
           <a href="#">Privacy policy</a>
         </FieldDescription>
       </footer>
+      {import.meta.env.DEV && (
+        <Button
+          variant="outline"
+          size="sm"
+          className="fixed right-4 bottom-4 border-dashed"
+          onClick={() => setStep("home")}
+        >
+          Skip sign-in (dev)
+        </Button>
+      )}
     </div>
   )
 }

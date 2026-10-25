@@ -1,28 +1,23 @@
 import {
-  BookOpen,
-  Box,
   Bell,
+  BookOpen,
   ChartColumn,
   ChevronDown,
   ChevronRight,
-  CircleQuestion,
+  ClipboardCheck,
   CodeXml,
-  FileText,
+  Folder,
   Home,
   Inbox,
-  List,
   LogOut,
-  Moon,
+  Puzzle,
   Search,
-  SlidersHorizontal,
-  SquareCheck,
-  Sun,
+  Settings,
   Users,
 } from "@keyline-icons/react"
 import { cn } from "cn"
 import { useCallback, useEffect, useRef, useState } from "react"
 
-import { useTheme } from "@/components/theme-provider"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
   Collapsible,
@@ -79,33 +74,30 @@ const data = {
       id: "maya",
       name: "Maya Chen",
       initials: "MC",
-      detail: "Grade 11 · ICS3U",
       color: "bg-blue-300 text-blue-950",
     },
     {
       id: "sam",
       name: "Sam Rivera",
       initials: "SR",
-      detail: "Grade 12 · ICS4U",
       color: "bg-emerald-300 text-emerald-950",
     },
   ],
   nav: [
     { title: "Home", url: "#", icon: Home },
     { title: "Inbox", url: "#", icon: Inbox, unread: 2 },
-    { title: "Assignments", url: "#", icon: SquareCheck, count: 3 },
+    { title: "Assignments", url: "#", icon: ClipboardCheck, count: 3 },
     { title: "Practice", url: "#", icon: CodeXml },
-    { title: "Projects", url: "#", icon: Box },
+    { title: "Projects", url: "#", icon: Folder },
   ],
   classes: [
     {
       title: "ICS3U · Period 2",
       code: "3U",
-      color: "bg-blue-600",
       isOpen: true,
       items: [
         { title: "Lessons", url: "#", icon: BookOpen, isActive: true },
-        { title: "Problem sets", url: "#", icon: List },
+        { title: "Problem sets", url: "#", icon: Puzzle },
         { title: "Classmates", url: "#", icon: Users },
         { title: "Grades", url: "#", icon: ChartColumn },
       ],
@@ -113,19 +105,18 @@ const data = {
     {
       title: "CCC Prep Club",
       code: "CC",
-      color: "bg-amber-700",
       isOpen: false,
       items: [
         { title: "Lessons", url: "#", icon: BookOpen },
-        { title: "Problem sets", url: "#", icon: List },
+        { title: "Problem sets", url: "#", icon: Puzzle },
         { title: "Members", url: "#", icon: Users },
       ],
     },
   ],
   pinned: [
     { title: "Lesson 4: BFS", url: "#", progress: { done: 3, total: 9 } },
-    { title: "Fewest transfers", url: "#", icon: FileText },
-    { title: "Weather app", url: "#", icon: Box, live: true },
+    { title: "Fewest transfers", url: "#", icon: Puzzle },
+    { title: "Weather app", url: "#", icon: Folder, live: true },
   ],
 }
 
@@ -201,7 +192,14 @@ function OrganizationLogo({ className }: { className?: string }) {
   )
 }
 
-function OrganizationSwitcher() {
+// The switchers' menus hang from their whole bar rather than the button, so
+// they line up with the rows below on both sides. The icon rail's bar is only
+// as wide as a button, so there they keep a width of their own.
+function OrganizationSwitcher({
+  anchor,
+}: {
+  anchor: React.RefObject<HTMLElement | null>
+}) {
   const iconOnly = useIconOnly()
   const [activeId, setActiveId] = useState(data.organizations[0].id)
   const active =
@@ -219,12 +217,13 @@ function OrganizationSwitcher() {
             active.color
           )}
         />
-        <span className="truncate font-semibold">{active.name}</span>
+        <span className="truncate font-medium">{active.name}</span>
         <ChevronDown className="text-sidebar-foreground/60" />
       </DropdownMenuTrigger>
       <DropdownMenuContent
+        anchor={anchor}
         side={iconOnly ? "right" : "bottom"}
-        className="w-60"
+        className={cn(iconOnly && "w-56")}
       >
         <DropdownMenuGroup>
           <DropdownMenuLabel>Organizations</DropdownMenuLabel>
@@ -262,31 +261,35 @@ function SidebarToggle({ className }: { className: string }) {
   )
 }
 
-function UserSummary({
+function UserAvatar({
   user,
-  size,
-  avatarClassName,
+  className,
+  initialsClassName,
 }: {
   user: (typeof data.users)[number]
-  size?: "default" | "sm"
-  avatarClassName?: string
+  className?: string
+  initialsClassName?: string
 }) {
   return (
-    <>
-      <Avatar size={size} className={avatarClassName}>
-        <AvatarFallback className={cn("text-xs font-semibold", user.color)}>
-          {user.initials}
-        </AvatarFallback>
-      </Avatar>
-      <span className="grid flex-1 text-left leading-tight">
-        <span className="truncate text-sm font-medium">{user.name}</span>
-        <span className="truncate text-xs opacity-60">{user.detail}</span>
-      </span>
-    </>
+    <Avatar className={className}>
+      <AvatarFallback
+        className={cn("text-xs font-semibold", user.color, initialsClassName)}
+      >
+        {user.initials}
+      </AvatarFallback>
+    </Avatar>
   )
 }
 
-function UserSwitcher({ onSignOut }: { onSignOut: () => void }) {
+// Laid out like the organization switcher, so the two bars and their menus
+// match.
+function UserSwitcher({
+  anchor,
+  onSignOut,
+}: {
+  anchor: React.RefObject<HTMLElement | null>
+  onSignOut: () => void
+}) {
   const iconOnly = useIconOnly()
   const [activeId, setActiveId] = useState(data.users[0].id)
   const active =
@@ -297,22 +300,29 @@ function UserSwitcher({ onSignOut }: { onSignOut: () => void }) {
       <DropdownMenuTrigger
         render={<SidebarMenuButton size="lg" className="h-10" />}
       >
-        <UserSummary
+        <UserAvatar
           user={active}
-          avatarClassName="size-7 group-data-[collapsible=icon]:ml-0.5"
+          className="size-7 group-data-[collapsible=icon]:ml-0.5"
         />
+        <span className="truncate font-medium">{active.name}</span>
       </DropdownMenuTrigger>
       <DropdownMenuContent
+        anchor={anchor}
         side={iconOnly ? "right" : "top"}
         align={iconOnly ? "end" : "start"}
-        className="w-60"
+        className={cn(iconOnly && "w-56")}
       >
         <DropdownMenuGroup>
           <DropdownMenuLabel>Accounts</DropdownMenuLabel>
           <DropdownMenuRadioGroup value={activeId} onValueChange={setActiveId}>
             {data.users.map((user) => (
               <DropdownMenuRadioItem key={user.id} value={user.id} closeOnClick>
-                <UserSummary user={user} size="sm" />
+                <UserAvatar
+                  user={user}
+                  className="size-5"
+                  initialsClassName="text-[9px]"
+                />
+                {user.name}
               </DropdownMenuRadioItem>
             ))}
           </DropdownMenuRadioGroup>
@@ -324,26 +334,6 @@ function UserSwitcher({ onSignOut }: { onSignOut: () => void }) {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
-}
-
-function ThemeToggle() {
-  const { setTheme } = useTheme()
-
-  return (
-    <SidebarMenuButton
-      tooltip="Toggle theme"
-      aria-label="Toggle theme"
-      className="size-8"
-      onClick={() =>
-        setTheme(
-          document.documentElement.classList.contains("dark") ? "light" : "dark"
-        )
-      }
-    >
-      <Sun className="hidden dark:block" />
-      <Moon className="dark:hidden" />
-    </SidebarMenuButton>
   )
 }
 
@@ -392,7 +382,7 @@ function SidebarSearch() {
       >
         <span className="sr-only">Search</span>
       </SidebarMenuButton>
-      <Search className="pointer-events-none absolute top-1/2 left-2 size-4 -translate-y-1/2 text-sidebar-foreground/60 transition-colors duration-250 ease-in-out group-data-[collapsible=icon]:text-sidebar-foreground group-data-[collapsible=icon]:group-hover/search:text-sidebar-accent-foreground" />
+      <Search className="pointer-events-none absolute top-1/2 left-2 size-4 -translate-y-1/2 text-sidebar-foreground/60" />
       {/* In the rail the side padding leaves no room for text, so the
           placeholder is clipped away as the field narrows. */}
       <SidebarInput
@@ -446,12 +436,13 @@ function SidebarSection({
   )
 }
 
-function ClassBadge({ code, color }: { code: string; color: string }) {
+// Black on white, and gray like the icons unless the current page is in it.
+function ClassBadge({ code, current }: { code: string; current: boolean }) {
   return (
     <span
       className={cn(
-        "flex size-4.5 shrink-0 items-center justify-center rounded-[5px] text-[9px] font-bold text-white group-data-[collapsible=icon]:size-5",
-        color
+        "flex size-4.5 shrink-0 items-center justify-center rounded-[5px] bg-sidebar-foreground/60 text-[9px] font-bold text-sidebar group-data-[collapsible=icon]:size-5",
+        current && "bg-sidebar-foreground"
       )}
     >
       {code}
@@ -463,6 +454,7 @@ function ClassBadge({ code, color }: { code: string; color: string }) {
 // the pages, so they open in a menu beside it instead.
 function ClassMenuItem({ item }: { item: (typeof data.classes)[number] }) {
   const iconOnly = useIconOnly()
+  const current = item.items.some((page) => page.isActive)
 
   if (iconOnly) {
     return (
@@ -471,12 +463,12 @@ function ClassMenuItem({ item }: { item: (typeof data.classes)[number] }) {
           <DropdownMenuTrigger
             render={
               <SidebarMenuButton
-                isActive={item.items.some((page) => page.isActive)}
+                isActive={current}
                 className="group-data-[collapsible=icon]:p-1.5!"
               />
             }
           >
-            <ClassBadge code={item.code} color={item.color} />
+            <ClassBadge code={item.code} current={current} />
             <span>{item.title}</span>
           </DropdownMenuTrigger>
           <DropdownMenuContent side="right" className="w-48">
@@ -505,7 +497,7 @@ function ClassMenuItem({ item }: { item: (typeof data.classes)[number] }) {
       render={<SidebarMenuItem />}
     >
       <CollapsibleTrigger render={<SidebarMenuButton />}>
-        <ClassBadge code={item.code} color={item.color} />
+        <ClassBadge code={item.code} current={current} />
         <span className="truncate">{item.title}</span>
         <ChevronRight className="ml-auto text-sidebar-foreground/60 transition-transform duration-200 ease-out group-data-open/class:rotate-90" />
       </CollapsibleTrigger>
@@ -536,6 +528,8 @@ export function AppSidebar({
   onSignOut: () => void
 }) {
   const settled = useSidebarSettled()
+  const organizationBarRef = useRef<HTMLUListElement>(null)
+  const accountBarRef = useRef<HTMLUListElement>(null)
 
   return (
     <Sidebar collapsible="icon" variant="inset" {...props}>
@@ -547,8 +541,9 @@ export function AppSidebar({
             while it resizes either: the toggle only fades as it slides, so
             the only scaling left is the hover swap and the press. */}
         <SidebarMenu
+          ref={organizationBarRef}
           data-settled={settled || undefined}
-          className="group/org h-12 justify-center"
+          className="group/org h-10 justify-center"
         >
           {/* One toggle, pinned to the end of the bar, so it rides the
               shrinking edge and lands on the logo as the sidebar collapses.
@@ -557,8 +552,8 @@ export function AppSidebar({
               It stays clickable while invisible, but the pointer can only
               reach it by hovering the bar, which reveals it. */}
           <SidebarMenuItem className="flex items-center pr-9 transition-[padding] duration-250 ease-in-out group-data-[collapsible=icon]:pr-0">
-            <OrganizationSwitcher />
-            <SidebarToggle className="absolute inset-y-0 right-0 my-auto size-8 text-sidebar-foreground/60 transition-[opacity,color,background-color] duration-150 ease-out group-data-settled/org:transition-[opacity,scale,color,background-color] group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:group-data-settled/org:scale-75 group-data-[collapsible=icon]:group-data-settled/org:bg-sidebar-accent group-data-[collapsible=icon]:group-data-settled/org:text-sidebar-accent-foreground group-data-[collapsible=icon]:group-data-settled/org:group-hover/org:scale-100 group-data-[collapsible=icon]:group-data-settled/org:group-hover/org:opacity-100 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:focus-visible:scale-100 group-data-[collapsible=icon]:focus-visible:opacity-100 active:scale-[0.97]! motion-reduce:transition-none! dark:hover:bg-sidebar-accent" />
+            <OrganizationSwitcher anchor={organizationBarRef} />
+            <SidebarToggle className="absolute inset-y-0 right-0 my-auto size-8 text-sidebar-foreground/60 transition-[opacity,background-color] duration-150 ease-out group-data-settled/org:transition-[opacity,scale,background-color] group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:group-data-settled/org:scale-75 group-data-[collapsible=icon]:group-data-settled/org:bg-sidebar-accent group-data-[collapsible=icon]:group-data-settled/org:group-hover/org:scale-100 group-data-[collapsible=icon]:group-data-settled/org:group-hover/org:opacity-100 hover:bg-sidebar-accent hover:text-sidebar-foreground/60 group-data-[collapsible=icon]:focus-visible:scale-100 group-data-[collapsible=icon]:focus-visible:opacity-100 active:scale-[0.97]! motion-reduce:transition-none! dark:hover:bg-sidebar-accent" />
           </SidebarMenuItem>
         </SidebarMenu>
         <SidebarSearch />
@@ -632,35 +627,26 @@ export function AppSidebar({
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              tooltip="Help and shortcuts"
-              render={<a href="#" />}
-            >
-              <CircleQuestion />
-              <span>Help and shortcuts</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
             <SidebarMenuButton tooltip="Settings" render={<a href="#" />}>
-              <SlidersHorizontal />
+              <Settings />
               <span>Settings</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
         <SidebarSeparator className="mx-0 transition-[margin] duration-250 ease-in-out group-data-[collapsible=icon]:mx-2" />
-        {/* A row in the full sidebar, a column in the icon rail. The theme
-            and notification buttons are pinned to the bar's corner so they
-            can slide between the two: in the row they sit after the
-            account, and in the column they stack above it, each a button
-            plus the menu gap (2.125rem) higher than the last. */}
-        <SidebarMenu className="pr-18transition-[height,padding] relative h-10 justify-end duration-250 ease-in-out group-data-[collapsible=icon]:h-25 group-data-[collapsible=icon]:pr-0">
+        {/* A row in the full sidebar, a column in the icon rail. The
+            notifications button is pinned to the bar's corner so it can
+            slide between the two: in the row it sits after the account, and
+            in the column it stacks above it, a button plus the menu gap
+            (2.125rem) higher. */}
+        <SidebarMenu
+          ref={accountBarRef}
+          className="relative h-10 justify-end pr-9 transition-[height,padding] duration-250 ease-in-out group-data-[collapsible=icon]:h-16.5 group-data-[collapsible=icon]:pr-0"
+        >
           <SidebarMenuItem>
-            <UserSwitcher onSignOut={onSignOut} />
+            <UserSwitcher anchor={accountBarRef} onSignOut={onSignOut} />
           </SidebarMenuItem>
-          <SidebarMenuItem className="absolute right-9 bottom-1 transition-[right,bottom] duration-250 ease-in-out group-data-[collapsible=icon]:right-0 group-data-[collapsible=icon]:bottom-8.5">
-            <ThemeToggle />
-          </SidebarMenuItem>
-          <SidebarMenuItem className="absolute right-0 bottom-1 transition-[bottom] duration-250 ease-in-out group-data-[collapsible=icon]:bottom-17">
+          <SidebarMenuItem className="absolute right-0 bottom-1 transition-[bottom] duration-250 ease-in-out group-data-[collapsible=icon]:bottom-8.5">
             <SidebarMenuButton
               tooltip="Notifications"
               aria-label="Notifications"

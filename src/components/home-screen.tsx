@@ -1,6 +1,7 @@
 import { Bug, Play, Slash, Upload } from "@keyline-icons/react"
 
 import { AppSidebar } from "@/components/app-sidebar"
+import { type LessonProblem, ProblemNav } from "@/components/problem-nav"
 import { Badge } from "@/components/ui/badge"
 import {
   Breadcrumb,
@@ -25,6 +26,57 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { Workspace } from "@/components/workspace"
+import { hallwayShortcuts as problem } from "@/problems/hallway-shortcuts"
+
+// Placeholder: the lesson's problems, until lessons load from somewhere.
+// Only the open one is written so far.
+const LESSON_PROBLEMS: LessonProblem[] = [
+  { id: "lunch-line", number: 1, title: "Lunch line", url: "#", solved: true },
+  {
+    id: "locker-neighbours",
+    number: 2,
+    title: "Locker neighbours",
+    url: "#",
+    solved: true,
+  },
+  { id: "fire-drill", number: 3, title: "Fire drill", url: "#", solved: true },
+  {
+    id: problem.id,
+    number: problem.number,
+    title: problem.title,
+    url: "#",
+    solved: false,
+  },
+  { id: "phone-tree", number: 5, title: "Phone tree", url: "#", solved: false },
+  {
+    id: "library-maze",
+    number: 6,
+    title: "Library maze",
+    url: "#",
+    solved: false,
+  },
+  {
+    id: "bus-transfers",
+    number: 7,
+    title: "Bus transfers",
+    url: "#",
+    solved: false,
+  },
+  {
+    id: "knight-moves",
+    number: 8,
+    title: "Knight moves",
+    url: "#",
+    solved: false,
+  },
+  {
+    id: "word-ladder",
+    number: 9,
+    title: "Word ladder",
+    url: "#",
+    solved: false,
+  },
+]
 
 // On wider screens the secondary buttons sit on the sidebar's dark frame, so
 // they take its accent rather than the page's.
@@ -61,6 +113,13 @@ export function HomeScreen({ onSignOut }: { onSignOut: () => void }) {
               <LessonBreadcrumb />
             </div>
             <CodeActions />
+            {/* Inset like the text in the cards below, so the count lines up
+                with theirs rather than sitting on the card's corner. */}
+            <ProblemNav
+              problems={LESSON_PROBLEMS}
+              currentId={problem.id}
+              className="md:pr-3"
+            />
           </header>
           <SidebarInset className="min-h-0 bg-transparent">
             <Workspace />

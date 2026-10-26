@@ -11,6 +11,8 @@ function CollapsibleTrigger({ ...props }: CollapsiblePrimitive.Trigger.Props) {
   )
 }
 
+// The panel clips its contents so it can animate its height. Its box reaches
+// 2px past its contents on every side, so their focus rings aren't clipped.
 function CollapsibleContent({
   className,
   ...props
@@ -19,7 +21,7 @@ function CollapsibleContent({
     <CollapsiblePrimitive.Panel
       data-slot="collapsible-content"
       className={cn(
-        "h-(--collapsible-panel-height) overflow-hidden transition-[height] duration-200 ease-out data-ending-style:h-0 data-starting-style:h-0 motion-reduce:transition-none",
+        "-m-0.5 h-(--collapsible-panel-height) overflow-hidden p-0.5 transition-[height] duration-200 ease-out data-ending-style:h-0 data-starting-style:h-0 motion-reduce:transition-none",
         className
       )}
       {...props}
